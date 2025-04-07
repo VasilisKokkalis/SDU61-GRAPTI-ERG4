@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>EasyPark - Πλήρης Εντοπισμός</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+      color: #777;
+    }
+    h1 {
+      color: #004466;
+    }
+    button {
+      padding: 15px 20px;
+      font-size: 16px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #004c99;
+    }
+    #location {
+      margin-top: 30px;
+      background: blue;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>EasyPark - Πλήρης Εντοπισμός Θέσης</h1>
+  <button onclick="getLocation()">📍 Βρες τη Θέση μου</button>
+
+  <div id="location">Αναμονή για εντοπισμό...</div>
+
+  <script>
+    function getLocation() {
+      const output = document.getElementById("location");
+
+      if (!navigator.geolocation) {
+        output.innerText = "Η συσκευή δεν υποστηρίζει το Geolocation API.";
+        return;
+      }
+
+      output.innerText = "Εντοπίζουμε τη θέση σας...";
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const coords = position.coords;
+
+          const lat = coords.latitude?.toFixed(6);
+          const lng = coords.longitude?.toFixed(6);
+          const alt = coords.altitude !== null ? `${coords.altitude.toFixed(2)} m` : "Μη διαθέσιμο";
+          const accuracy = `${coords.accuracy.toFixed(2)} m`;
+          const altAccuracy = coords.altitudeAccuracy !== null ? `${coords.altitudeAccuracy.toFixed(2)} m` : "Μη διαθέσιμο";
+          const heading = coords.heading !== null ? `${coords.heading.toFixed(2)}°` : "Μη διαθέσιμο";
+          const speed = coords.speed !== null ? `${coords.speed.toFixed(2)} m/s` : "Μη διαθέσιμο";
+
+          output.innerHTML = `
+            <strong>📍 Πλάτος:</strong> ${lat}<br>
+            <strong>📍 Μήκος:</strong> ${lng}<br>
+            <strong>⛰️ Υψόμετρο:</strong> ${alt}<br>
+            <strong>🎯 Ακρίβεια:</strong> ${accuracy}<br>
+            <strong>🎯 Ακρίβεια Υψομέτρου:</strong> ${altAccuracy}<br>
+            <strong>🧭 Κατεύθυνση:</strong> ${heading}<br>
+            <strong>💨 Ταχύτητα:</strong> ${speed}
+          `;
+        },
+        function(error) {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              output.innerText = "⛔ Ο χρήστης αρνήθηκε την πρόσβαση στη θέση.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              output.innerText = "❌ Η θέση δεν είναι διαθέσιμη.";
+              break;
+            case error.TIMEOUT:
+              output.innerText = "⏱️ Ο χρόνος εντοπισμού εξαντλήθηκε.";
+              break;
+            default:
+              output.innerText = "❗ Άγνωστο σφάλμα.";
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+  </script>
+
+</body>
+</html>
+
