@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>EasyPark - Διαχείριση Χρηστών</title>
+</head>
+<body>
+  <h2>➕ Δημιουργία Χρήστη</h2>
+  <input type="text" id="name" placeholder="Όνομα">
+  <input type="email" id="email" placeholder="Email">
+  <button onclick="createUser()">Προσθήκη</button>
+
+  <h3>📋 Λίστα Χρηστών</h3>
+  <ul id="userList"></ul>
+
+  <script>
+    const apiBase = "http://localhost/example_create";
+
+    async function fetchUsers() {
+      const res = await fetch(`${apiBase}/read.php`);
+      const users = await res.json();
+      const list = document.getElementById("userList");
+      list.innerHTML = "";
+      users.forEach(user => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>${user.name}</strong> (${user.email}) 
+          <button onclick="editUser(${user.id}, '${user.name}', '${user.email}')">✏️</button>
+          <button onclick="deleteUser(${user.id})">🗑️</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    async function createUser() {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+
+      await fetch(`${apiBase}/create.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email })
+      });
+
+      document.getElementById("name").value = "";
+      document.getElementById("email").value = "";
+      fetchUsers();
+    }
+
+    async function deleteUser(id) {
+      if (!confirm("Είσαι σίγουρος;")) return;
+
+      await fetch(`${apiBase}/delete.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+
+      fetchUsers();
+    }
+
+    function editUser(id, currentName, currentEmail) {
+      const newName = prompt("Νέο όνομα:", currentName);
+      const newEmail = prompt("Νέο email:", currentEmail);
+
+      if (newName && newEmail) {
+        updateUser(id, newName, newEmail);
+      }
+    }
+
+    async function updateUser(id, name, email) {
+      await fetch(`${apiBase}/update.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, name, email })
+      });
+
+      fetchUsers();
+    }
+
+    fetchUsers();
+  </script>
+</body>
+</html>
