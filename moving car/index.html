@@ -20,8 +20,8 @@
     }
 
     #car {
-      width: 30px;
-      height: 30px;
+      width: 20px;
+      height: 20px;
       background-color: red;
       position: absolute;
       top: 0;
@@ -56,14 +56,53 @@
     let posX = 0;
     let posY = 0;
 
+    // 🔄 Φόρτωση της τελευταίας αποθηκευμένης θέσης
+    window.onload = () => {
+      fetch('get_position.php')
+        .then(response => response.json())
+        .then(data => {
+          posX = parseInt(data.x);
+          posY = parseInt(data.y);
+          updatePosition();
+        })
+        .catch(error => {
+          console.error("Σφάλμα κατά τη φόρτωση θέσης:", error);
+        });
+    };
+
+    // 📦 Αποθήκευση της τρέχουσας θέσης
+    function savePosition() {
+      fetch('saveposition.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `x=${posX}&y=${posY}`
+      })
+      .then(response => response.text())
+      .then(result => {
+        console.log("Αποθηκεύτηκε:", result);
+      })
+      .catch(error => {
+        console.error("Σφάλμα κατά την αποθήκευση θέσης:", error);
+      });
+    }
+
+    // 🔁 Ενημέρωση θέσης αυτοκινήτου στο UI
+    function updatePosition() {
+      car.style.left = posX + 'px';
+      car.style.top = posY + 'px';
+    }
+
+    // 🎮 Μετακίνηση αυτοκινήτου με έλεγχο ορίων
     function move(direction) {
       if (direction === 'up' && posY >= step) posY -= step;
       if (direction === 'down' && posY <= lotSize - step * 2) posY += step;
       if (direction === 'left' && posX >= step) posX -= step;
       if (direction === 'right' && posX <= lotSize - step * 2) posX += step;
 
-      car.style.top = posY + 'px';
-      car.style.left = posX + 'px';
+      updatePosition();
+      savePosition();
     }
   </script>
 
