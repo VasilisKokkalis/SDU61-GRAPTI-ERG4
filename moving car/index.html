@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EasyPark Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    #parkingLot {
+      width: 300px;
+      height: 300px;
+      border: 2px solid black;
+      margin: 20px auto;
+      position: relative;
+      background-color: #e0e0e0;
+    }
+
+    #car {
+      width: 30px;
+      height: 30px;
+      background-color: red;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: 0.2s ease;
+    }
+
+    .controls button {
+      margin: 5px;
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>EasyPark - Μετακίνηση Αυτοκινήτου</h2>
+  <div id="parkingLot">
+    <div id="car"></div>
+  </div>
+
+  <div class="controls">
+    <button onclick="move('up')">⬆ Πάνω</button><br>
+    <button onclick="move('left')">⬅ Αριστερά</button>
+    <button onclick="move('right')">➡ Δεξιά</button><br>
+    <button onclick="move('down')">⬇ Κάτω</button>
+  </div>
+
+  <script>
+    const car = document.getElementById('car');
+    const step = 30;
+    const lotSize = 300;
+    let posX = 0;
+    let posY = 0;
+
+    function move(direction) {
+      if (direction === 'up' && posY >= step) posY -= step;
+      if (direction === 'down' && posY <= lotSize - step * 2) posY += step;
+      if (direction === 'left' && posX >= step) posX -= step;
+      if (direction === 'right' && posX <= lotSize - step * 2) posX += step;
+
+      car.style.top = posY + 'px';
+      car.style.left = posX + 'px';
+    }
+  </script>
+
+</body>
+</html>
